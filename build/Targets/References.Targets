@@ -9,6 +9,7 @@
         <IncludeFakeSignReference>true</IncludeFakeSignReference>
         <IncludeTestReferences>false</IncludeTestReferences>
         <IncludeVSSDKReferences>false</IncludeVSSDKReferences>
+        <IncludeMicrobuildReferences>true</IncludeMicrobuildReferences>
       </PropertyGroup>
     </When>
     <When Condition="'$(TestProject)' == 'true'">
@@ -20,6 +21,7 @@
         <IncludeFakeSignReference>true</IncludeFakeSignReference>
         <IncludeTestReferences>true</IncludeTestReferences>
         <IncludeVSSDKReferences>false</IncludeVSSDKReferences>
+        <IncludeMicrobuildReferences>false</IncludeMicrobuildReferences>
       </PropertyGroup>
     </When>
     <When Condition="'$(SetupProject)' == 'true'">
@@ -31,6 +33,7 @@
         <IncludeFakeSignReference>true</IncludeFakeSignReference>
         <IncludeTestReferences>false</IncludeTestReferences>
         <IncludeVSSDKReferences>true</IncludeVSSDKReferences>
+        <IncludeMicrobuildReferences>true</IncludeMicrobuildReferences>
       </PropertyGroup>
     </When>
   </Choose>
@@ -102,4 +105,13 @@
     </When>
   </Choose>
 
+  <Choose>
+    <When Condition="'$(IncludeMicrobuildReferences)' == 'true'">
+      <ItemGroup>
+        <PackageReference Include="MicroBuild.Core.Sentinel" Version="1.0.0" />
+        <PackageReference Include="MicroBuild.Core" Version="$(MicroBuildVersion)" />
+        <PackageReference Include="MicroBuild.Plugins.SwixBuild" Version="1.1.0-g0701ee829f" ExcludeAssets="Build" />
+      </ItemGroup>
+    </When>
+  </Choose>
 </Project>
