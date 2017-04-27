@@ -162,7 +162,7 @@
   </Choose>
    
   <ItemGroup>
-    <FilesToSign Condition="'$(OfficialBuild)' == 'true' AND '$(NonShipping)' != 'true'" Include="$(OutDir)\$(AssemblyName).dll">
+    <FilesToSign Condition="'$(OfficialBuild)' == 'true' AND '$(NonShipping)' != 'true' AND '$(AnalyzerProject)' == 'true'" Include="$(OutDir)\$(AssemblyName).dll">
       <Authenticode>Microsoft</Authenticode>
       <StrongName>$(StrongNameCertificateFriendlyId)</StrongName>
     </FilesToSign>
@@ -234,19 +234,6 @@
     <Exec Command="&quot;$(FakeSignToolPath)&quot; &quot;@(IntermediateAssembly)&quot;" />
 
   </Target>
-
-  <!-- ====================================================================================
-  
-         Support for real-signing assemblies
-
-       ==================================================================================== -->
-
-  <ItemGroup Condition="'$(DelaySign)' == 'true' AND '$(ShouldSignBuild)' == 'true' AND ('$(Language)' == 'C#' OR '$(Language)' == 'VB')">
-    <FilesToSign Include="$(OutDir)$(TargetFileName)">
-      <Authenticode>MicrosoftSHA1</Authenticode>
-      <StrongName>MsSharedLib72</StrongName>
-    </FilesToSign>
-  </ItemGroup>
 
   <!-- ====================================================================================
        
