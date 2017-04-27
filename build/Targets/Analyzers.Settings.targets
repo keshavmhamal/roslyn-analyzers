@@ -21,6 +21,7 @@
     <NuGetPackageRoot Condition="'$(NuGetPackageRoot)' == '' and
                                  '$(OS)' != 'Windows_NT'">$(HOME)\.nuget\packages</NuGetPackageRoot>
     <XUnitVersion>2.1.0</XUnitVersion>
+    <MicroBuildVersion>0.2.0</MicroBuildVersion>
   </PropertyGroup>
 
   <!-- Project language -->
