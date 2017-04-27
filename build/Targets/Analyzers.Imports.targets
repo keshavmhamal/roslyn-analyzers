@@ -113,18 +113,38 @@
     <DefineConstants>$(DefineConstants),USE_INTERNAL_IOPERATION_APIS,DEFAULT_SEVERITY_SUGGESTION</DefineConstants>
   </PropertyGroup>
 
-  <!-- Settings for strong name signing -->
+  <!-- settings for strong name signing -->
+  <PropertyGroup Condition="'$(OfficialBuild)' == 'true'">
+    <MicroBuildSigningLibraryV2>$(BUILD_ARTIFACTSTAGINGDIRECTORY)\MicroBuild\Plugins\MicroBuild.Plugins.Signing.1.0.227\build\MicroBuild.Signing.dll</MicroBuildSigningLibraryV2>
+    <MicroBuildSigningLibrary Condition="Exists('$(MicroBuildSigningLibraryV2)')">$(MicroBuildSigningLibraryV2)</MicroBuildSigningLibrary>
+    <StrongNameCertificate Condition="'$(StrongNameCertificate)' == ''">MicrosoftShared</StrongNameCertificate>
+  </PropertyGroup>
+
   <Choose>
     <When Condition="'$(SignAssembly)' == 'true'">
       <Choose>
-        <!-- Shipping binaries are always public signed.  In the case of an official build $(OfficialBuild) the
-             binaries will be real signed as a post processing step. -->
+        <!-- Shipping binaries in an "official" build are delay-signed with the MS key; later, the signing
+             system will finish the strong-name signing. -->        
         <When Condition="'$(NonShipping)' != 'true'">
+          <Choose>
+            <!-- DelaySign if we're real signing, otherwise public sign -->
+            <When Condition="'$(OfficialBuild)' == 'true'">
+              <PropertyGroup>
+                <DelaySign>true</DelaySign>
+              </PropertyGroup>
+            </When>
+            <Otherwise>
+              <PropertyGroup>
+                <PublicSign>true</PublicSign>
+              </PropertyGroup>
+            </Otherwise>
+          </Choose>
+          
           <PropertyGroup>
             <AssemblyOriginatorKeyFile>$(AnalyzersToolsPath)\Strong Name Keys\35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
             <PublicKey>$(RoslynPublicKey)</PublicKey>
             <PublicKeyToken>31BF3856AD364E35</PublicKeyToken>
-            <PublicSign>true</PublicSign>
+            <StrongNameCertificateFriendlyId>72</StrongNameCertificateFriendlyId>
           </PropertyGroup>
         </When>
 
@@ -140,6 +160,19 @@
       </Choose>
     </When>
   </Choose>
+   
+  <ItemGroup>
+    <FilesToSign Condition="'$(OfficialBuild)' == 'true' AND '$(NonShipping)' != 'true'" Include="$(OutDir)\$(AssemblyName).dll">
+      <Authenticode>Microsoft</Authenticode>
+      <StrongName>$(StrongNameCertificateFriendlyId)</StrongName>
+    </FilesToSign>
+  </ItemGroup>
+
+  <ItemGroup>
+    <FilesToSign Condition="'$(OfficialBuild)' == 'true' AND '$(NonShipping)' != 'true' AND '$(SetupProject)' == 'true'" Include="$(TargetVsixContainer)">
+      <Authenticode>VsixSHA2</Authenticode>
+    </FilesToSign>
+  </ItemGroup>
 
   <!-- VSIX projects generate a temp project file which doesnt have any extension and needs to be built as C# projects. The .NET SDK
        just imporrts Microsoft.Common.CurrentVersion.targets. So set LanguageTargets to import CSharp.targets if the 
